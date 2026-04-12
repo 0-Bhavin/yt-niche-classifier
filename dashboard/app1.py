@@ -1,6 +1,7 @@
 import streamlit as st
 import random
 import math
+from pathlib import Path
 from pdf_generator import generate_cpv_report
 # --- Configuration ---
 st.set_page_config(page_title="CPV Dashboard", layout="wide")
@@ -73,10 +74,28 @@ cpv_data = [{"title": f"CPV Value {i+1}", "value": random.randint(15, 100)} for 
 # Sort the data dynamically in descending order
 cpv_data = sorted(cpv_data, key=lambda x: x["value"], reverse=False)
 
-# 1. Company Name and Download Button Header
-col_title, col_btn = st.columns([0.8, 0.2])
+# 1. Company Name and Download/Upload Button Header
+col_title, col_upload, col_btn = st.columns([0.6, 0.2, 0.2])
 with col_title:
     st.title("Acme Corporation")
+with col_upload:
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # CSV File Uploader
+    uploaded_file = st.file_uploader(
+        "Upload CSV",
+        type="csv",
+        label_visibility="collapsed",
+        key="csv_uploader"
+    )
+    
+    if uploaded_file is not None:
+        # Save to db folder
+        db_path = Path(__file__).parent.parent / "db" / uploaded_file.name
+        with open(db_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+        st.success(f"✓ Saved: {uploaded_file.name}")
+
 with col_btn:
     st.markdown("<br>", unsafe_allow_html=True)
     

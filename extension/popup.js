@@ -39,17 +39,34 @@ document.getElementById("clearBtn").addEventListener("click", () => {
 });
 
 document.getElementById("exportBtn").addEventListener("click", () => {
+  let statusEl = document.getElementById("status");
+  statusEl.innerText = "Saving...";
+  statusEl.style.color = "#666";
+
   chrome.storage.local.get(["videos"], (data) => {
     let videos = data.videos || [];
 
-    let csv = "video_url\n" + videos.join("\n");
-
-    let blob = new Blob([csv], {type: "text/csv"});
-    let url = URL.createObjectURL(blob);
-
-    chrome.downloads.download({
-      url: url,
-      filename: "yt_videos.csv"
+    fetch("http://localhost:5000/save-videos", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({videos: videos})
+    })
+    .then(response => response.json())
+    .then(result => {
+      if (result.status === "success") {
+        statusEl.innerText = "✓ Saved to: data/extension_videos.json";
+        statusEl.style.color = "green";
+      } else {
+        statusEl.innerText = "✗ Error: " + result.message;
+        statusEl.style.color = "red";
+      }
+    })
+    .catch(error => {
+      statusEl.innerText = "✗ Cannot connect to server. Make sure server.py is running!";
+      statusEl.style.color = "red";
+      console.error("Error:", error);
     });
   });
 });
