@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "YT Niche Collector",
+  "version": "1.0",
+  "description": "Collect YouTube URLs and export them as CSV in batches.",
+  "permissions": [
+    "tabs",
+    "storage",
+    "downloads",
+    "activeTab"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "YT Niche Collector"
+  }
+}
